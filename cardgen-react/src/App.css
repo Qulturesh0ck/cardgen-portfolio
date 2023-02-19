@@ -1,0 +1,124 @@
+html {
+  box-sizing: border-box;
+  font-size: 100%;
+}
+
+*,
+*:before,
+*:after {
+  box-sizing: inherit;
+}
+
+
+.navbar {
+  display: flex;
+  flex: 1 1 0px;
+  background-color: #353535;
+  padding: 0 0 0 0;
+}
+
+.navlogo {
+  max-width: 10%;
+  padding: 5px 5px 5px 5px
+}
+
+.topbutton {
+  margin: 5px 5px;
+}
+
+.header {
+  flex: 1 1 200px;
+  align-self: flex-end;
+}
+
+body {
+  background-color: #e0e0e0;
+  color: #353535;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+section,
+aside,
+div {
+  padding: 20px;
+  border-radius: 12px;
+}
+
+h1 {
+  font-size: 2rem;
+  color: #e0e0e0;
+  text-align: left;
+  margin: 80px
+}
+
+h2 {
+  font-size: 3rem;
+}
+
+h1,
+h2,
+h3 {
+  margin-top: 0px;
+  margin-bottom: 0px;
+}
+
+.flex-container {
+  display: flex;
+  margin: 10px 200px 50px 200px
+}
+
+label {
+  color: #414141;
+  opacity: 80%;
+  float: left;
+  /*margin-right: 25px;/*/
+  font-weight: bold;
+  padding: 0px 25px 0px 25px;
+  font-size: small;
+}
+
+form {
+  flex: 1 1 1 100px;
+  padding-right: 10px;
+  align-items: flex-start;
+}
+
+/* .keyspace {
+  flex: 1 1 1 1000px;
+  padding: 1000 1000 1000 1000;
+  margin: 1000 1000 1000 1000;
+}
+/*/
+
+
+.genForm {
+  flex: 1 1 100px;
+  padding-left: 0 0 0 0;
+  margin: 0 0 0 0;
+}
+
+.form-container {
+  display: flex;
+  padding: 10px;
+  margin: 0 0 0 0;
+}
+
+.statLine {
+  width: 50px;
+  box-sizing: border-box;
+}
+
+
+.genCard {
+  flex: 0 0 500px;
+  padding: 0 0 0 0;
+  margin-left: 0;
+  align-items: right;
+}
+
+img {
+  max-width: 100%;
+  max-height: 90%;
+  margin: 0;
+  padding: 0 0 0 0;
+}
