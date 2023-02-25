@@ -1,5 +1,5 @@
 # For more information, please refer to https://aka.ms/vscode-docker-python
-FROM python:3.8-slim
+FROM python:3.9
 
 EXPOSE 5000
 
@@ -21,5 +21,7 @@ COPY . /cardgen-react
 RUN adduser -u 5678 --disabled-password --gecos "" appuser && chown -R appuser /app
 USER appuser
 
+ENV FLASK_APP=wsgi.py
+
 # During debugging, this entry point will be overridden. For more information, please refer to https://aka.ms/vscode-docker-python-debug
-CMD ["gunicorn", "--bind", "0.0.0.0:5000", "app:app"]
+CMD ["flask", "run", "--host", "0.0.0.0:5000"]
