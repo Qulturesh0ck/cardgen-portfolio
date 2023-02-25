@@ -3,11 +3,11 @@ from ..models import User, db, Card #,cards_table
 import hashlib
 import secrets
 from flask_sqlalchemy import SQLAlchemy
+from flask_jwt_extended import create_access_token
 
 def scramble(password: str):
     """Hash and salt the given password"""
-    salt = secrets.token_hex(16)
-    return hashlib.sha512((password + salt).encode('utf-8')).hexdigest()
+    return hashlib.sha512((password).encode('utf-8')).hexdigest()
 
 
 bp = Blueprint('users', __name__, url_prefix='/users')
@@ -26,6 +26,26 @@ def index():
 def show(id: int):
     u = User.query.get_or_404(id)
     return jsonify(u.serialize())
+
+
+###Test this later !!!
+
+@bp.route('/login', methods=['POST'])
+def login():
+    username = request.json.get('username')
+    password = request.json.get('password')
+
+    user = User.query.filter_by(username=username).first()
+    if not user:
+        return jsonify({'message': 'User not found'}), 400
+
+    if user.password != hashlib.sha512((password).encode('utf-8')).hexdigest():
+        return jsonify({'message': 'Incorrect password'}), 400
+
+    access_token = create_access_token(identity=user.id)
+    return jsonify({'access_token': access_token}), 200
+### Test this later !!
+""""""
 
 
 @bp.route('', methods=['POST'])
@@ -79,59 +99,3 @@ def update(id: int):
         return jsonify(u.serialize())
     except:
         return jsonify(False)
-
-'''
-
-@bp.route('/<int:id>/created_cards', methods=['GET'])
-def created_cards(id: int):
-    u = User.query.get_or_404(id)
-    result = []
-    for c in u.created_cards:
-        result.append(c.serialize())
-    return jsonify(result)
-
-
-# ################
-# #### BONUS  ####
-# ################
-
-
-@bp.route('/<int:id>/cards', methods=['POST'])
-def like(id: int):
-    if 'card_id' not in request.json:
-        return abort(400)
-
-    card_id = request.json['card_id']
-
-    # check user and tweet exist
-    User.query.get_or_404(id)
-    Card.query.get_or_404(card_id)
-
-    try:
-        stmt = sqlalchemy.insert(cards_table).values(
-            user_id=id, card_id=card_id)
-        db.session.execute(stmt)
-        db.session.commit()
-        return jsonify(True)
-    except:
-        return jsonify(False)
-
-
-@bp.route('/<int:user_id>/cards/<int:card_id>', methods=['DELETE'])
-def unlike(user_id: int, card_id: int):
-    # check user and tweet exist
-    User.query.get_or_404(user_id)
-    Card.query.get_or_404(card_id)
-
-    try:
-        stmt = sqlalchemy.delete(cards_table).where(
-            cards_table.c.user_id == user_id,
-            cards_table.c.card_id == card_id
-        )
-        db.session.execute(stmt)
-        db.session.commit()
-        return jsonify(True)
-    except:
-        return jsonify(False)
-
-'''

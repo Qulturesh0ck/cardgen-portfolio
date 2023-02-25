@@ -45,7 +45,7 @@ class GeneratedCard(db.Model):
     
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     card_id = db.Column(db.Integer, db.ForeignKey('cards.card_id'), nullable=False)
-    
+    card = db.relationship('Card', backref ='generated_cards')
     def __init__(self, imagepath:str, card_id: int,  user_id: int):
         self.imagepath = imagepath
         self.user_id = user_id
@@ -55,7 +55,8 @@ class GeneratedCard(db.Model):
             'imagepath' : self.imagepath,
             'card_id': self.card_id,
             'user_id': self.user_id,
-            'gen_id' : self.gen_id
+            'gen_id' : self.gen_id,
+            'card_name':self.card.name
 
         }
 
@@ -75,4 +76,10 @@ class User(db.Model):
             'id': self.id,
             'username': self.username,
         }
-    
+
+"""
+class Cards_Images(db.Model):
+    __tablename__ = 'cards_images'
+    card_id = db.Column(db.Integer, db.ForeignKey('cards.card_id'), nullable=False)
+    imagepath = db.Column(db.String, nullable=True)
+    """

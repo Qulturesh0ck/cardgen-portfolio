@@ -1,88 +1,84 @@
 from PIL import Image, ImageDraw, ImageFont
 from flask_cors import CORS
-# Version 2
-# -- Put fonts here
-fontLora = ImageFont.truetype("Lora-VariableFont_wght.ttf", size=65)
+import requests
+def GenerateCard(id):
+    trueURL = f"http://localhost:5000/cards"
+    response = requests.get(f"{trueURL}/{id}")
+    if response.ok:
+        data = response.json()
+        #print(f"Generating image for {trueURL}/{id}")
+        #for item in data:
+            #print(item)
+    else:
+        print("ERROR")
+
+    # -- Put fonts here
+    fontLora = ImageFont.truetype("Lora-VariableFont_wght.ttf", size=65)
+    fontLora45 = ImageFont.truetype("Lora-VariableFont_wght.ttf", size=45)
+    # -- End Fonts
+
+    uploadedImg = Image.open("src/images/magmawyrm.png")
+    templateChoice = Image.open("src/images/CardTemplates/OrangeCardTemplate.png")
+    draw = ImageDraw.Draw(templateChoice)
+
+    cardNameWidth = 1010
+    cardNameheight = 109
+    maxWidthName = cardNameWidth - 50
+    minHeightName = cardNameheight - 5
 
 
-# -- End Fonts
+    template = templateChoice
+    cardNameString = f"{data['name']}"
+
+    bBoxcardName = draw.textbbox(
+        (100, 100), f"{cardNameString}", font=fontLora)
+    bBox = draw.textbbox(
+        (100, 100), f"{cardNameString}", font=fontLora)
+
+    cardNameWidth = bBoxcardName[2] - bBoxcardName[0]
+    cardNameHeight = bBoxcardName[3] - bBoxcardName[1]
+    txtWidthName = bBox[2] - bBox[0]
+
+    #cardName
+    draw.text((155, 115, 10, 10+minHeightName),
+                        cardNameString, font=fontLora, fill='#191919')
+    
+    img = uploadedImg
+
+    #cardDesc 
+    draw.text((125, 1414), f"{data['description']}"
+                        , font=fontLora45, fill='#191919')
+
+    #battlePoints
+    draw.text((780, 1680), f"BP/ {data['bp']}"
+                        , font=fontLora45, fill='#191919')
+
+    #healthPoints
+    draw.text((970, 1680), f"HP/ {data['hp']}", font=fontLora45, fill='#191919')
+
+    #genCard
+    template.paste(img, (189, 323))
+    print(f"Saving template... to ./images/Gencards/user{data['user_id']}_card{data['card_id']}.png")
+    #Save image
+    imagepath = f"{data['user_id']}_{data['card_id']}.png"
+    filename = f"./public/images/Gencards/{data['user_id']}_{data['card_id']}.png"
+    template.save(f"{filename}", format='PNG')
+
+    return {
+		"card_id": data['card_id'],
+		"card_name": cardNameString,
+		"imagepath": imagepath,
+        "user_id": data['user_id']
+    }
 
 
-uploadedImg = Image.open("images\SAM.png")
-templateChoice = Image.open("images\BlackCardTemplate.png")
-draw = ImageDraw.Draw(templateChoice)
 
 
-cardNameWidth = 1010
-cardNameheight = 109
-maxWidthName = cardNameWidth - 50
-minHeightName = cardNameheight - 5
 
 
-template = templateChoice
-cardNameString = "How Long Can I Possibly Make This Before I Break It Baby"
-
-bBoxcardName = draw.textbbox(
-    (100, 100), f"{cardNameString}", font=fontLora)
-bBox = draw.textbbox(
-    (100, 100), "How Long Can I Possibly Make T", font=fontLora)
-
-cardNameWidth = bBoxcardName[2] - bBoxcardName[0]
-cardNameHeight = bBoxcardName[3] - bBoxcardName[1]
-txtWidthName = bBox[2] - bBox[0]
-
-
-while cardNameWidth > maxWidthName:
-    fontLora = ImageFont.truetype(
-        "Lora-VariableFont_wght.ttf", fontLora.size - 1)
-    cardNameWidth = draw.textlength(cardNameString, font=fontLora)
-
-
-while cardNameHeight < minHeightName:
-    fontLora = ImageFont.truetype(
-        "Lora-VariableFont_wght.ttf", fontLora.size + 1)
-    newbBox = draw.textbbox((10, 10), f"{cardNameString}", font=fontLora)
-    cardNameHeight = newbBox[3] - newbBox[1]
-
-newWidth = cardNameWidth * minHeightName / cardNameHeight
-
-cardName = draw.text((155, 115, 10+newWidth, 10+minHeightName),
-                     cardNameString, font=fontLora, fill='#0000')
-img = uploadedImg
-cardDesc = "PH"
-battlePoints = "PH"
-healthPoints = "PH"
-
-genCard = template.paste(img, (189, 323))
-template.save(f"images\Gencards\{cardNameString}.png")
-
-
-# FINISH THIS TODAY
+###
 # Name box x-155 y-115
 # Class Spot x-128, y-1410
-
-
-"""
-
-Deprecated method
-
-dontUse, txtHeight = draw.textsize(cardNameString, font=fontLora)
-while txtHeight < minHeightName:
-    fontLora = ImageFont.truetype(
-        "Lora-VariableFont_wght.ttf", fontLora.size - 1)
-    txtHeight = draw.textsize(cardNameString, font=fontLora)
-"""
-
-"""
-
-template = Image.open("CardTemplates/OrangeCardTemplate.png")
-pic = Image.open(
-    "images/SAM.png").resize((911, 944), Image.ANTIALIAS)
-
-card = template.paste(pic, (189, 323))
-
-template.save("images/Gencards/Genimage.png")
-"""
 #  artbox dimensions: x-646 y-794
 # topleft corner: 194,324
 # bottomright corner: 1099, 1266

@@ -1,11 +1,74 @@
 import { useEffect, useState } from 'react';
-import axios from "axios"
-import { format } from "date-fns";
 import './App.css';
-import { Card, User } from './models.py'
+/*
+import axios from "axios";
+import { format } from "date-fns";
+import { Card, User } from './models.py';
+import CardNameList from './components/CardNameList.js';
+import Login from './components/UserLogin';
+import SaveCardData from './components/SaveCardTesting.js'
+const card = [Card]
+*/
 
-const baseUrl = "http://localhost:5000"
-//const card = [Card]
+function CardNameList2() {
+  {
+    const baseUrl = 'http://127.0.0.1:5000/'
+    const [selectedCardID, setSelectedCardID] = useState("");
+    const [selectedCardImage, setSelectedCardImage] = useState("");
+    const [cardName, setCardName] = useState([])
+    useEffect(() => {
+      fetch(`${baseUrl}generatedcards`, {
+        'methods': 'GET',
+        //withCredentials: true,
+        //mode: 'no-cors',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+        .then(resp => resp.json())
+        .then(resp => setCardName(resp))
+        .catch(error => console.log(error))
+    }, []);
+
+    const handleLoadImage = () => {
+      fetch(`http://127.0.0.1:5000/images/Gencards/${selectedCardID}`, {
+        methods: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+        .then((resp) => resp.blob())
+        .then((resp) => setSelectedCardImage(URL.createObjectURL(resp)))
+        .catch((error) => console.log(error));
+    };
+
+    const handleSelectChange = (event) => {
+      setSelectedCardID(event.target.value);
+      setSelectedCardImage("");
+    };
+
+    return (
+      <section className='genCard'>
+        <div className='cardList'>
+          <select onChange={handleSelectChange} value={{ selectedCardID }}>
+            <option value="">--Select a card--</option>
+            {cardName.map(list => {
+              return (
+                <option key={list.imagepath} value={list.imagepath}>
+                  {list.card_name}
+                </option>
+              )
+            })}
+          </select>
+          <button onClick={handleLoadImage} disabled={!{ selectedCardID }}>
+            Load
+          </button>
+          <CardImagePath selectedCardID={selectedCardID} />
+        </div>
+      </section >
+    )
+  }
+}
 
 
 function Navbar() {
@@ -15,10 +78,10 @@ function Navbar() {
       <div className="header">
         <h1>Card Generator α</h1>
       </div>
+
       <div className="upper">
         <button className="topbutton" type="button" onClick={() => console.log('Login')}>Login</button>
         <button className="topbutton" type="button" onClick={() => console.log('Logout')}>Logout</button>
-        <button className="topbutton" type="button" onClick={() => console.log('Load')}>Load</button>
       </div>
     </div >
   );
@@ -35,16 +98,15 @@ function CardImage() {
 
 }
 
-
-
-
-function CardImagetest() {
+function CardImagePath(props) {
   {
     {
+      const baseURL = 'http://127.0.0.1:5000/'
+      const frontEndURL = 'http://127.0.0.1:3000/images/Gencards/'
       const [cardImage, setCardImage] = useState([])
 
       useEffect(() => {
-        fetch('http://127.0.0.1:5000/cards', {
+        fetch(`${baseURL}generatedcards/${props.selectedCardID}`, {
           'methods': 'GET',
           //withCredentials: true,
           //mode: 'no-cors',
@@ -55,59 +117,18 @@ function CardImagetest() {
           .then(resp => resp.json())
           .then(resp => setCardImage(resp))
           .catch(error => console.log(error))
-      }, [])
-
-
-
-      return (
-        <section className="genCard">
-          <h2>Placeholder value</h2>
-          {cardImage.map(card => {
-            return (
-              <section key={card.id}>
-                <h2>{card.name}</h2>
-              </section>
-            )
-          })}
-        </section>
-      )
-    }
-  }
-}
-
-
-function CardImagePath() {
-  {
-    {
-      const [cardImage, setCardImage] = useState([])
-
-      useEffect(() => {
-        fetch('http://127.0.0.1:5000/generatedcards', {
-          'methods': 'GET',
-          //withCredentials: true,
-          //mode: 'no-cors',
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        })
-          .then(resp => resp.json())
-          .then(resp => setCardImage(resp))
-          .catch(error => console.log(error))
-      }, [])
+      }, [props.selectedCardID])
 
 
 
       return (
         <section className="genCard">
           <h2>Testing Card Image</h2>
-          {cardImage.map(card => {
-            return (
-              <section key={card.gen_id}>
-                <img src={"http://localhost:3000/images/Gencards/" + card.imagepath} alt="Placeholder" />
-                <h2>{card.imagepath}</h2>
-              </section>
-            )
-          })}
+
+          <section className="genCard">
+            <h2>{props.selectedCardID}</h2>
+            <img src={frontEndURL + props.selectedCardID} alt="Generated Card" />
+          </section>
         </section>
       )
     }
@@ -115,17 +136,50 @@ function CardImagePath() {
 }
 
 
+
+
 function Form() {
-  const [cardName, setCardName] = useState('');
+  const [name, setCardNameForm] = useState('');
   const [cost, setCost] = useState('');
   const [cardClass, setCardClass] = useState('');
   const [cardType, setCardType] = useState('Artifact');
   const [alignment, setAlignment] = useState('Air');
-  const [battlePoints, setBattlePoints] = useState('');
-  const [healthPoints, setHealthPoints] = useState('');
+  const [bp, setBattlePoints] = useState('');
+  const [hp, setHealthPoints] = useState('');
   const [description, setDescription] = useState('');
-
-  fetch('')
+  const [cardData, setCardData] = useState([]);
+  const [image, setImage] = useState('');
+  const user_id = 1;
+  //const [user_idDELETE, getUser] = useState(user.user_id)
+  const handleSave = (e) => {
+    e.preventDefault();
+    const formData = {
+      user_id,
+      name,
+      image,
+      //cost,
+      //cardClass,
+      //cardType,
+      //alignment,
+      bp,
+      hp,
+      description,
+    };
+    fetch('http://127.0.0.1:5000/cards', {
+      method: 'POST',
+      //mode: 'no-cors',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(formData)
+    })
+      .then(resp => resp.json())
+      .then(data => {
+        setCardData([...cardData, data]);
+        console.log('Card data saved successfully!');
+      })
+      .catch(error => console.error(error));
+  };
 
   return (
     <main className="flex-container">
@@ -139,8 +193,8 @@ function Form() {
               type="text"
               id="cardName"
               name="cardName"
-              value={cardName}
-              onChange={(e) => setCardName(e.target.value)}
+              value={name}
+              onChange={(e) => setCardNameForm(e.target.value)}
             />
           </div>
           <div className="form-container">
@@ -178,7 +232,7 @@ function Form() {
             <label htmlFor="PHalignment">Alignment</label>
 
             <select
-              name="alingmentPicker"
+              name="alignmentPicker"
               id="alingmentPicker"
               value={alignment}
               onChange={(e) => setAlignment(e.target.value)}
@@ -192,14 +246,27 @@ function Form() {
               <option value="Water">Water</option>
             </select>
           </div>
+          <div className='form-container'>
+            <label
+              htmlFor="img"
+            >Select image:</label>
+          </div>
           <div className="form-container">
+
+            <input
+              type="file"
+              id="img"
+              name="img"
+              accept="image/png, image/jpeg"
+              value={image}
+              onChange={(e) => setImage(e.target.value)} />
             <label htmlFor="statLine1">Battle Points</label>
             <input
               type="text"
               className="statLine"
               id="statLine1"
               name="statLine1"
-              value={battlePoints}
+              value={bp}
               onChange={(e) => setBattlePoints(e.target.value)}
             />
             <label htmlFor="statLine2">Health Points</label>
@@ -208,7 +275,7 @@ function Form() {
               className="statLine"
               id="statLine2"
               name="statLine2"
-              value={healthPoints}
+              value={hp}
               onChange={(e) => setHealthPoints(e.target.value)}
             />
           </div>
@@ -225,7 +292,7 @@ function Form() {
             </textarea>
           </div>
           <div className="buttonContainer">
-            <button type="button" onClick={() => console.log('Save')}>
+            <button type="button" onClick={handleSave}>
               Save
             </button>
             <button type="button" onClick={() => console.log('Load')}>
@@ -240,7 +307,7 @@ function Form() {
           </div>
         </form>
       </section >
-      <CardImagePath />
+      <CardNameList2 />
     </main >
   );
 }

@@ -2,6 +2,7 @@ import os
 from flask import Flask
 from flask_migrate import Migrate
 from flask_cors import CORS
+from flask_jwt_extended import JWTManager
 
 
 
@@ -10,12 +11,17 @@ from flask_cors import CORS
 def create_app(test_config=None):
     app = Flask(__name__, instance_relative_config=True)
     CORS(app)
+
     app.config.from_mapping(
         SECRET_KEY='dev',
         SQLALCHEMY_DATABASE_URI='postgresql://postgres@localhost:5432/cardgenB',
         SQLALCHEMY_TRACK_MODIFICATIONS=False,
         SQLALCHEMY_ECHO=True
+        
     )
+
+    app.config['JWT_SECRET_KEY'] = 'super-secret'  # replace with your own secret key
+    jwt = JWTManager(app)
 
     if test_config is None:
         # load the instance config, if it exists, when not testing
