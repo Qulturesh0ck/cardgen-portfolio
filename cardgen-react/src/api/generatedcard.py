@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, abort, request
 from ..models import Card, User, GeneratedCard,  db
-from ..cardgenprotoV2 import GenerateCard
+from ....backend.src.cardgenprotoV2 import GenerateCard
 
 bp = Blueprint('generatedcards', __name__, url_prefix='/generatedcards')
 
