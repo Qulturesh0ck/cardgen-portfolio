@@ -10,12 +10,12 @@ services:
     ports:
       - 5000:5000
   nginx:
-    build: ./cardgen-react/nginx
+    build: ./cardgen-react
     image: 702351145102.dkr.ecr.us-east-2.amazonaws.com/portfolio_cardgen:cardgen-react_nginx
     volumes:
       - static_volume:/usr/src/app/static
     ports:
-      - 5000:80
+      - 8080:80
     depends_on:
       - web
 volumes:
