@@ -1,0 +1,24 @@
+version: "3.8"
+services:
+  web:
+    build: ./backend
+    image: 702351145102.dkr.ecr.us-east-2.amazonaws.com/portfolio_cardgen:cardgen-react_web
+    command: gunicorn wsgi:app --bind 0.0.0.0:5000
+    volumes:
+      - ./app/:/usr/src/app/
+      - static_volume:/usr/src/app/static
+    ports:
+      - 5000:5000
+  nginx:
+    build: ./cardgen-react
+    image: 702351145102.dkr.ecr.us-east-2.amazonaws.com/portfolio_cardgen:cardgen-react_nginx
+    volumes:
+      - static_volume:/usr/src/app/static
+    ports:
+      - 8080:80
+    depends_on:
+      - web
+volumes:
+  static_volume:
+
+
